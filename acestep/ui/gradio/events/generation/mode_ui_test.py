@@ -23,7 +23,7 @@ except Exception as exc:  # pragma: no cover - environment dependency guard
     _IMPORT_ERROR = exc
 
 # Output indices for the two new state-clearing outputs
-_IDX_TASK_TYPE = 5
+_IDX_TASK_TYPE = 5       # Index of task_type (gr.State) in compute_mode_ui_updates return tuple
 _IDX_AUDIO_CODES = 44
 _IDX_SRC_AUDIO = 45
 _IDX_THINK_CHECKBOX = 14
