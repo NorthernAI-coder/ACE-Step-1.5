@@ -2202,6 +2202,40 @@ class AceStepConditionGenerationModel(AceStepPreTrainedModel):
             "time_costs": time_costs,
         }
 
+    def flowedit_generate_audio(self, **kwargs):
+        """Flow-edit (#1156) on the turbo CFG-distilled DiT.
+
+        Turbo's ``generate_audio`` uses a fixed ``fix_nfe=8`` lookup
+        table snapped to discrete shifts (1/2/3); we mirror that
+        schedule here and pass it as ``timesteps=`` to the shared
+        pipeline.  Paired CFG is forced off (``guidance_scale=1.0``)
+        because turbo bakes guidance into the distillation — running a
+        second null-cond forward would just double compute for noise.
+        """
+        from acestep.models.common.flow_edit_pipeline import (
+            flowedit_generate_audio as _flowedit_impl,
+        )
+        from acestep.models.common.turbo_schedule import build_turbo_timestep_schedule
+
+        gs = kwargs.get("diffusion_guidance_scale", 1.0)
+        if gs != 1.0:
+            logger.info(
+                "Turbo flow-edit ignores guidance_scale=%.2f (turbo is "
+                "CFG-distilled); forcing 1.0.", gs,
+            )
+        kwargs["diffusion_guidance_scale"] = 1.0
+
+        t_schedule_list = build_turbo_timestep_schedule(
+            infer_steps=kwargs.get("infer_steps"),
+            shift=kwargs.get("shift", 3.0),
+            timesteps=kwargs.get("timesteps"),
+        )
+        src_latents = kwargs["src_latents"]
+        kwargs["timesteps"] = torch.tensor(
+            t_schedule_list, device=src_latents.device, dtype=src_latents.dtype,
+        )
+        return _flowedit_impl(self, **kwargs)
+
 
 def test_forward(model, seed=42):
     # Fix random seed for reproducibility
