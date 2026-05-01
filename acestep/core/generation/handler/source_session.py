@@ -10,9 +10,6 @@ import numpy as np
 import torch
 
 
-_LEGACY_RETAKE_MODE_ALIASES = {"retake", "most_natural", "most-natural", "most natural"}
-
-
 def normalize_repaint_mode_alias(mode: str) -> str:
     """Normalize repaint mode aliases to supported public modes.
 
@@ -22,8 +19,7 @@ def normalize_repaint_mode_alias(mode: str) -> str:
     Returns:
         Canonical public repaint mode string.
     """
-    requested = (mode or "auto").strip().lower()
-    return "balanced" if requested in _LEGACY_RETAKE_MODE_ALIASES else requested
+    return (mode or "auto").strip().lower()
 
 
 def resolve_repaint_mode(mode: str, source_session_dir: Optional[str] = None) -> str:

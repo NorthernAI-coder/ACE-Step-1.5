@@ -11,19 +11,19 @@ from acestep.ui.gradio.events.wiring.generation_mode_wiring import (
 class RepaintModeChoiceTests(unittest.TestCase):
     """Verify repaint mode choices remain stable."""
 
-    def test_legacy_most_natural_value_resets_without_session_folder(self):
-        """Legacy most natural should not appear in choices."""
-        update = _on_source_session_dir_change("", "most natural")
+    def test_unknown_repaint_mode_value_resets_without_session_folder(self):
+        """Unsupported repaint mode values should reset to auto."""
+        update = _on_source_session_dir_change("", "unsupported")
 
-        self.assertNotIn("most natural", update["choices"])
+        self.assertEqual(["auto", "conservative", "balanced", "aggressive"], update["choices"])
         self.assertEqual("auto", update["value"])
 
-    def test_most_natural_hidden_with_existing_session_folder(self):
+    def test_session_folder_keeps_standard_repaint_choices(self):
         """Generated sessions are hidden state, not a separate user-facing mode."""
         with tempfile.TemporaryDirectory() as tmp:
             update = _on_source_session_dir_change(tmp, "balanced")
 
-        self.assertNotIn("most natural", update["choices"])
+        self.assertEqual(["auto", "conservative", "balanced", "aggressive"], update["choices"])
         self.assertEqual("balanced", update["value"])
 
 

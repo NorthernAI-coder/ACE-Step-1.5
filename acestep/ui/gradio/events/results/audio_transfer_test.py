@@ -34,12 +34,12 @@ class SendAudioToRepaintTests(unittest.TestCase):
 
         repaint_mode_update = result[6 + 33]
         self.assertEqual("Repaint", result[1]["value"])
-        self.assertNotIn("most natural", repaint_mode_update["choices"])
+        self.assertEqual(["auto", "conservative", "balanced", "aggressive"], repaint_mode_update["choices"])
         self.assertEqual("auto", repaint_mode_update["value"])
         self.assertEqual(session_dir, result[-2])
         self.assertEqual(2, result[-1])
 
-    def test_send_to_repaint_without_session_hides_most_natural_choice(self):
+    def test_send_to_repaint_without_session_keeps_standard_repaint_choices(self):
         """Non-session repaint should keep the ordinary repaint choices."""
         result = send_audio_to_repaint(
             "/tmp/sample.wav",
@@ -53,7 +53,7 @@ class SendAudioToRepaintTests(unittest.TestCase):
         )
 
         repaint_mode_update = result[6 + 33]
-        self.assertNotIn("most natural", repaint_mode_update["choices"])
+        self.assertEqual(["auto", "conservative", "balanced", "aggressive"], repaint_mode_update["choices"])
         self.assertEqual("", result[-2])
         self.assertEqual(1, result[-1])
 
@@ -85,7 +85,7 @@ class SendAudioToRepaintTests(unittest.TestCase):
             )
 
         repaint_mode_update = result[6 + 33]
-        self.assertNotIn("most natural", repaint_mode_update["choices"])
+        self.assertEqual(["auto", "conservative", "balanced", "aggressive"], repaint_mode_update["choices"])
         self.assertEqual(session_dir, result[-2])
         self.assertEqual(2, result[-1])
 

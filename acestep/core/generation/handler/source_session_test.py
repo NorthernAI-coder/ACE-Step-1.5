@@ -27,13 +27,11 @@ class SourceSessionTests(unittest.TestCase):
         """Auto mode should keep the standard repaint path."""
         self.assertEqual("balanced", resolve_repaint_mode("auto", None))
         self.assertEqual("balanced", resolve_repaint_mode("auto", "/tmp/session"))
-        self.assertEqual("balanced", resolve_repaint_mode("most natural", "/tmp/session"))
         self.assertEqual("aggressive", resolve_repaint_mode("aggressive", "/tmp/session"))
 
-    def test_legacy_retake_alias_normalizes_to_balanced(self):
-        """Legacy retake strings should not expose a separate repaint path."""
-        self.assertEqual("balanced", normalize_repaint_mode_alias("retake"))
-        self.assertEqual("balanced", normalize_repaint_mode_alias("most_natural"))
+    def test_repaint_mode_normalization_strips_and_lowercases(self):
+        """Mode normalization should only canonicalize casing and whitespace."""
+        self.assertEqual("balanced", normalize_repaint_mode_alias(" Balanced "))
 
     def test_load_source_track_does_not_require_audio_codes(self):
         """Source repaint tracks only require saved final latents."""
